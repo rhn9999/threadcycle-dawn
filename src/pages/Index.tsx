@@ -1,16 +1,70 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { useState } from "react";
+import { products } from "@/data/products";
+import AnnouncementBar from "@/components/threadcycle/AnnouncementBar";
+import Header from "@/components/threadcycle/Header";
+import CartDrawer from "@/components/threadcycle/CartDrawer";
+import MobileNavDrawer from "@/components/threadcycle/MobileNavDrawer";
+import Footer from "@/components/threadcycle/Footer";
+import HomePage from "@/components/threadcycle/HomePage";
+import ShopPage from "@/components/threadcycle/ShopPage";
+import ProductDetailPage from "@/components/threadcycle/ProductDetailPage";
+import AboutPage from "@/components/threadcycle/AboutPage";
+import FAQPage from "@/components/threadcycle/FAQPage";
 
-// IMPORTANT: Fully REPLACE this with your own code
-const PlaceholderIndex = () => {
-  // PLACEHOLDER: Replace this entire return statement with the user's app.
-  // The inline background color is intentionally not part of the design system.
+const Index = () => {
+  const [page, setPage] = useState("home");
+  const [cartOpen, setCartOpen] = useState(false);
+  const [navOpen, setNavOpen] = useState(false);
+  const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
+
+  const navigate = (p: string) => {
+    setPage(p);
+    setSelectedProductId(null);
+    window.scrollTo(0, 0);
+  };
+
+  const viewProduct = (id: string) => {
+    setSelectedProductId(id);
+    setPage("detail");
+    window.scrollTo(0, 0);
+  };
+
+  const selectedProduct = products.find(p => p.id === selectedProductId);
+
   return (
-    <div className="flex min-h-screen items-center justify-center" style={{ backgroundColor: '#fcfbf8' }}>
-      <img data-lovable-blank-page-placeholder="REMOVE_THIS" src="/placeholder.svg" alt="Your app will live here!" />
+    <div>
+      <AnnouncementBar />
+      <Header
+        activePage={page}
+        onNavigate={navigate}
+        onOpenCart={() => setCartOpen(true)}
+        onOpenNav={() => setNavOpen(true)}
+      />
+
+      <main>
+        {page === "home" && <HomePage onNavigate={navigate} onViewProduct={viewProduct} />}
+        {page === "shop" && <ShopPage onNavigate={navigate} onViewProduct={viewProduct} />}
+        {page === "detail" && selectedProduct && (
+          <ProductDetailPage product={selectedProduct} onNavigate={navigate} />
+        )}
+        {page === "about" && <AboutPage />}
+        {page === "faq" && <FAQPage />}
+      </main>
+
+      <Footer onNavigate={navigate} />
+
+      <CartDrawer
+        open={cartOpen}
+        onClose={() => setCartOpen(false)}
+        onContinueShopping={() => navigate("shop")}
+      />
+      <MobileNavDrawer
+        open={navOpen}
+        onClose={() => setNavOpen(false)}
+        onNavigate={navigate}
+      />
     </div>
   );
 };
-
-const Index = PlaceholderIndex;
 
 export default Index;
